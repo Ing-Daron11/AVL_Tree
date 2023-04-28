@@ -12,47 +12,33 @@ public class AVL<E> implements ABB<E>{
     }
 
 	@Override
-	public void add(E e) {
-		Node<E> n = new Node<>(e);
+	public void add(E element) {
+		Node<E> node = new Node<>(element);
 		if(root == null) {
-			root = n;
+			root = node;
 		}else {
-			add(n, root);
+			add(node, this.root);
 		}
 	}
 	
-	//mayores e iguales a la derecha*
-	public void add(Node<E> n, Node<E> r) {
-		if(comparator.compare(n.getElement(), r.getElement()) >= 0) {
-			if(r.getRight() == null) {
-				r.setRight(n);
-				n.setParent(r);
+	//mayores e iguales a la derecha
+	public void add(Node<E> node, Node<E> current) {
+		if(comparator.compare(node.getElement(), current.getElement()) >= 0) {
+			if(current.getRight() == null) {
+				current.setRight(node);
+				node.setParent(current);
 			}else {
-				add(n, r.getRight());
+				add(node, current.getRight());
 			}
 		}else {
-			if(r.getLeft() == null) {
-				r.setLeft(n);
-				n.setParent(r);
+			if(current.getLeft() == null) {
+				current.setLeft(node);
+				node.setParent(current);
 			}else {
-				add(n,r.getLeft());
+				add(node,current.getLeft());
 			}
 		}
-		balance(n);
-	}
-	
-	public List<E> searchList(){
-		List<E> l = new ArrayList<>();
-		return searchList(l, root);
-	}
-	
-	private List<E> searchList(List<E> l, Node<E> r){
-		if(r!=null) {
-			searchList(l, r.getLeft());
-			l.add(r.getElement());
-			searchList(l, r.getRight());
-		}
-		return l;
+		balance(node);
 	}
 	
 	public E search(E s) {
@@ -126,32 +112,32 @@ public class AVL<E> implements ABB<E>{
 		}
 	}
 
-	private void balance(Node<E> n) {
+	private void balance(Node<E> node) {
 		do {
-			if(n.fb()==-2) {
-				if(n.getLeft()!=null) {
-					if(n.getLeft().fb()==-1 || n.getLeft().fb()==0) {
-						rotateRight(n);
+			if(node.fb()==-2) {
+				if(node.getLeft()!=null) {
+					if(node.getLeft().fb()==-1 || node.getLeft().fb()==0) {
+						rotateRight(node);
 					}else {
-						rotateLeft(n.getLeft());
-						rotateRight(n);
+						rotateLeft(node.getLeft());
+						rotateRight(node);
 					}
 
 				}
-			}else if(n.fb() == 2) {
-				if(n.getRight() != null) {
-					if(n.getRight().fb() == 1 || n.getRight().fb() == 0) {
-						rotateLeft(n);
+			}else if(node.fb() == 2) {
+				if(node.getRight() != null) {
+					if(node.getRight().fb() == 1 || node.getRight().fb() == 0) {
+						rotateLeft(node);
 					}else {
-						rotateRight(n.getRight());
-						rotateLeft(n);
+						rotateRight(node.getRight());
+						rotateLeft(node);
 					}
 				}
 			} else {
 				
 			}
-			n = n.getParent();
-		}while(n != null);
+			node = node.getParent();
+		}while(node != null);
 	}
 	
 	public int getheight(Node<E> n){
@@ -171,31 +157,31 @@ public class AVL<E> implements ABB<E>{
 		
 	}
 
-    public int fb(Node<E> n){
-    	return getheight(n.getRight())-getheight(n.getLeft());
+    public int fb(Node<E> node){
+    	return getheight(node.getRight())-getheight(node.getLeft());
     }
 	
-	private void rotateLeft(Node<E> n) {
-		if(!n.equals(root)) {	
-			Node<E> p = n.getParent();
+	private void rotateLeft(Node<E> node) {
+		if(!node.equals(root)) {
+			Node<E> p = node.getParent();
 
-			n.setParent(n.getRight());
-			n.getRight().setParent(p);
-			n.setRight(n.getRight().getLeft());
-			if(n.getRight() != null) {
-				n.getRight().setParent(n);
+			node.setParent(node.getRight());
+			node.getRight().setParent(p);
+			node.setRight(node.getRight().getLeft());
+			if(node.getRight() != null) {
+				node.getRight().setParent(node);
 			}
-			n.getParent().setParent(p);
-			n.getParent().setLeft(n);
+			node.getParent().setParent(p);
+			node.getParent().setLeft(node);
 
-			if(p.getLeft() == n) {
-				p.setLeft(n.getParent());
+			if(p.getLeft() == node) {
+				p.setLeft(node.getParent());
 			} else {
-				p.setRight(n.getParent());
+				p.setRight(node.getParent());
 			}			
 		} else {
 			Node<E> left = root;
-			Node<E> aux = n.getRight();
+			Node<E> aux = node.getRight();
 			
 			root.setRight(aux.getLeft());
 			if(aux.getLeft() != null) {
@@ -208,27 +194,27 @@ public class AVL<E> implements ABB<E>{
 		}
 	}
 	
-	private void rotateRight(Node<E> n) {
-		if(!n.equals(root)) {
-			Node<E> p = n.getParent();
+	private void rotateRight(Node<E> node) {
+		if(!node.equals(root)) {
+			Node<E> p = node.getParent();
 			
-			n.setParent(n.getLeft());
-			n.getLeft().setParent(p);
-			n.setLeft(n.getLeft().getRight());
-			if(n.getLeft() != null) {
-				n.getLeft().setParent(n);
+			node.setParent(node.getLeft());
+			node.getLeft().setParent(p);
+			node.setLeft(node.getLeft().getRight());
+			if(node.getLeft() != null) {
+				node.getLeft().setParent(node);
 			}
-			n.getParent().setParent(p);
-			n.getParent().setRight(n);
+			node.getParent().setParent(p);
+			node.getParent().setRight(node);
 			
-			if(p.getLeft() == n) {
-				p.setLeft(n.getParent());
+			if(p.getLeft() == node) {
+				p.setLeft(node.getParent());
 			} else {
-				p.setRight(n.getParent());
+				p.setRight(node.getParent());
 			}
 		} else {
 			Node<E> right = root;
-			Node<E> aux = n.getLeft();
+			Node<E> aux = node.getLeft();
 			
 			root.setLeft(aux.getRight());
 			if(aux.getRight() != null) {
@@ -241,15 +227,6 @@ public class AVL<E> implements ABB<E>{
 		}
 	}
 	
-	@SuppressWarnings("unused") //este metodo no se usa
-	private Node<E> max(Node<E> r){
-		if(r.getRight()==null) {
-			return r;	
-		}else {
-			return max(r.getRight());
-		}
-	}
-	
 	private Node<E> min(Node<E> r){
 		if(r.getLeft()==null) {
 			return r;
@@ -257,45 +234,6 @@ public class AVL<E> implements ABB<E>{
 			return min(r.getLeft());
 		}
 	}
-	
-	public Node<E> getRoot(){
-        return root;
-    }
-	
-	public String printWithRelations(){
-        return printWithRelations(root);
-    }
-
-    private String printWithRelations(Node<E> c){
-        String s = "";
-        if(c != null){
-            s += printWithRelations(c.getLeft());
-            if(c.getParent() != null){
-                s += "Parent: " + c.getParent().getElement() + "\n";
-            } else{
-                s += "Parent: null"  + "\n";
-            }
-            
-            s += "Current: " + c.getElement() + "\n";
-            
-            if(c.getLeft() != null){
-                s += "Left: " + c.getLeft().getElement() + "\n";
-            } else{
-                s += "Left: null"  + "\n";
-            }
-            
-            if(c.getRight() != null){
-                s += "Right: " + c.getRight().getElement() + "\n";
-            } else{
-                s += "Right: null"  + "\n";
-            }
-            
-            s += "\n===================================\n";
-            s += printWithRelations(c.getRight());
-        }
-        return s;
-    }
-
 	public String inOrderString(){
 		return inOrderString(root);
 	}
@@ -304,7 +242,6 @@ public class AVL<E> implements ABB<E>{
 		if(current == null){
 			return "";
 		}
-
 		return inOrderString(current.getLeft()) + " " + current.getElement() + " " + inOrderString(current.getRight());
 	}
 
