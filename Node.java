@@ -7,8 +7,8 @@ public class Node<E>{
     Node<E> left;
     Node<E> right;
 
-    public Node(E e){
-        element = e;
+    public Node(E element){
+        this.element = element;
     }
 
     public int height(){
@@ -40,7 +40,9 @@ public class Node<E>{
     		return (right.height() - left.height());
     	}
     }
-    
+
+
+//--------------------Getters and Setters-----------------
     public E getElement(){
         return element;
     }

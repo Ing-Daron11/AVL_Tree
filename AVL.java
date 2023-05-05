@@ -41,71 +41,70 @@ public class AVL<E> implements ABB<E>{
 		balance(node);
 	}
 	
-	public E search(E s) {
+	public E search(E nodeSearched) {
 		if(root == null) {
 			return null;
 		}else {
-			return search(root, s).getElement();
+			return search(root, nodeSearched).getElement();
 		}
 	}
 
 	@Override
-	public Node<E> search(Node<E> r, E s) {
-		if(r.getElement()==null) {
-			return r;
-		}else if(comparator.compare(s, r.getElement())==0) {
-			return r;
-		}else if(comparator.compare(s, r.getElement())>0) {
-			return search(r.getRight(), s);
+	public Node<E> search(Node<E> current, E nodeSearched) {
+		if(current.getElement()==null) {
+			return current;
+		}else if(comparator.compare(nodeSearched, current.getElement())==0) {
+			return current;
+		}else if(comparator.compare(nodeSearched, current.getElement())>0) {
+			return search(current.getRight(), nodeSearched);
 		}else {
-			return search(r.getLeft(), s);
+			return search(current.getLeft(), nodeSearched);
 		}
 	}
 
 	@Override
-	public Node<E> delete(E d) {
-		Node<E> remove = search(root, d);
-		removeNode(remove);
-		
-		balance(remove.getParent());
-		return remove;
+	public Node<E> delete(E nodeDelete) {
+		Node<E> removeNode = search(root, nodeDelete);
+		removeNode(removeNode);
+		balance(removeNode);
+		return removeNode;
 	}
 	
-	private void removeNode(Node<E> d) {
-		if(d!=null) {	
-			if(isleaf(d)) {
-				if(d==root) {
+	private void removeNode(Node<E> removeNode) {
+		if(removeNode!=null) {
+			if(isleaf(removeNode)) {
+				if(removeNode==root) {
 					root=null;
-				}else if(d==d.getParent().getLeft()) {
-					d.getParent().setLeft(null);
+				}else if(removeNode==removeNode.getParent().getLeft()) {
+					removeNode.getParent().setLeft(null);
 				}else {
-					d.getParent().setRight(null);
+					removeNode.getParent().setRight(null);
 				}
-			}else if(d.getLeft()==null || d.getRight()==null) {
+			}else if(removeNode.getLeft()==null || removeNode.getRight()==null) {
 				Node<E> aux;
-				if(d.getLeft()!=null) {
-					aux=d.getLeft();
+				if(removeNode.getLeft()!=null) {
+					aux=removeNode.getLeft();
 				}else {
-					aux=d.getRight();
+					aux=removeNode.getRight();
 				}
-				aux.setParent(d.getParent());
-				if(d==root) {
+				aux.setParent(removeNode.getParent());
+				if(removeNode==root) {
 					root=aux;
-				}else if(d==d.getParent().getLeft()) {
-					d.getParent().setLeft(aux);
+				}else if(removeNode==removeNode.getParent().getLeft()) {
+					removeNode.getParent().setLeft(aux);
 				}else {
-					d.getParent().setRight(aux);
+					removeNode.getParent().setRight(aux);
 				}
 			}else {
-				Node<E> succesor = min(d.getRight());
-				d.setElement(succesor.getElement());
-				removeNode(succesor);
+				Node<E> successor = min(removeNode.getRight());
+				removeNode.setElement(successor.getElement());
+				removeNode(successor);
 			}
 		}
 	}
 	
-	private boolean isleaf(Node<E> d) {
-		if(d.getRight()==null && d.getLeft()==null) {
+	private boolean isleaf(Node<E> removeNode) {
+		if(removeNode.getRight()==null && removeNode.getLeft()==null) {
 			return true;
 		}else {
 			return false;
@@ -114,9 +113,9 @@ public class AVL<E> implements ABB<E>{
 
 	private void balance(Node<E> node) {
 		do {
-			if(node.fb()==-2) {
+			if(node.fb()<=-2) {
 				if(node.getLeft()!=null) {
-					if(node.getLeft().fb()==-1 || node.getLeft().fb()==0) {
+					if(node.getLeft().fb()<=-1 || node.getLeft().fb()==0) {
 						rotateRight(node);
 					}else {
 						rotateLeft(node.getLeft());
@@ -124,35 +123,33 @@ public class AVL<E> implements ABB<E>{
 					}
 
 				}
-			}else if(node.fb() == 2) {
-				if(node.getRight() != null) {
-					if(node.getRight().fb() == 1 || node.getRight().fb() == 0) {
+			}else if(node.fb() >= 2) {
+				if (node.getRight() != null) {
+					if (node.getRight().fb() >= 1 || node.getRight().fb() == 0) {
 						rotateLeft(node);
-					}else {
+					} else {
 						rotateRight(node.getRight());
 						rotateLeft(node);
 					}
 				}
-			} else {
-				
 			}
 			node = node.getParent();
 		}while(node != null);
 	}
 	
-	public int getheight(Node<E> n){
-    	if(n==null) {
+	public int getheight(Node<E> node){
+    	if(node==null) {
     		return 0;
     	}else {
-    		return 1+max(getheight(n.getRight()), getheight(n.getLeft()));
+    		return 1+max(getheight(node.getRight()), getheight(node.getLeft()));
     	}
     }
 
-    private int max(int l, int r) {
-		if(l>=r) {
-			return l;
+    private int max(int left, int right) {
+		if(left>=right) {
+			return left;
 		}else {
-			return r;
+			return right;
 		}
 		
 	}
@@ -163,21 +160,21 @@ public class AVL<E> implements ABB<E>{
 	
 	private void rotateLeft(Node<E> node) {
 		if(!node.equals(root)) {
-			Node<E> p = node.getParent();
+			Node<E> parent = node.getParent();
 
 			node.setParent(node.getRight());
-			node.getRight().setParent(p);
+			node.getRight().setParent(parent);
 			node.setRight(node.getRight().getLeft());
 			if(node.getRight() != null) {
 				node.getRight().setParent(node);
 			}
-			node.getParent().setParent(p);
+			node.getParent().setParent(parent);
 			node.getParent().setLeft(node);
 
-			if(p.getLeft() == node) {
-				p.setLeft(node.getParent());
+			if(parent.getLeft() == node) {
+				parent.setLeft(node.getParent());
 			} else {
-				p.setRight(node.getParent());
+				parent.setRight(node.getParent());
 			}			
 		} else {
 			Node<E> left = root;
@@ -227,11 +224,11 @@ public class AVL<E> implements ABB<E>{
 		}
 	}
 	
-	private Node<E> min(Node<E> r){
-		if(r.getLeft()==null) {
-			return r;
+	private Node<E> min(Node<E> removeNode){
+		if(removeNode.getLeft()==null) {
+			return removeNode;
 		}else {
-			return min(r.getLeft());
+			return min(removeNode.getLeft());
 		}
 	}
 	public String inOrderString(){
@@ -249,7 +246,7 @@ public class AVL<E> implements ABB<E>{
 		if (root == null) {
 			return "";
 		}
-		String msg = "";
+		String msj = "";
 		Queue<Node<E>> queue = new LinkedList<>();
 		queue.add(this.root);
 
@@ -257,7 +254,7 @@ public class AVL<E> implements ABB<E>{
 			int levelSize = queue.size();
 			for (int i = 0; i < levelSize; i++) {
 				Node<E> node = queue.poll();
-				msg = msg + (node.getElement() + " ");
+				msj = msj + (node.getElement() + " ");
 				if (node.left != null) {
 					queue.add(node.left);
 				}
@@ -267,8 +264,8 @@ public class AVL<E> implements ABB<E>{
 			}
 
 		}
-		msg = msg + "\n";
-		return msg;
+		msj = msj + "\n";
+		return msj;
 	}
 
 }
